@@ -2,7 +2,7 @@
 name = "forensic-carve"
 version = "0.0.0"
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.75"
 license = "Apache-2.0"
 description = "Fleet carving contract + single-pass sweep engine: signature detection over unallocated/memory regions dispatched to per-format carvers. SecurityRonin forensic fleet."
 repository = "https://github.com/SecurityRonin/forensic-carve"
