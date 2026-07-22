@@ -50,18 +50,26 @@ struct MemoryLikeSource {
 
 impl RegionSource for MemoryLikeSource {
     fn read_at(&self, offset: u64, buf: &mut [u8]) -> usize {
-        // RED: not yet reassembling across non-contiguous pages — serves only the
-        // first page, so any offset beyond page 0 reads as end-of-source.
-        let Some(page) = self.pages.first() else {
-            return 0;
-        };
-        let off = offset as usize;
-        if off >= page.len() {
-            return 0;
+        // Reassemble across non-contiguous pages: split the absolute offset into a
+        // page index + intra-page offset and copy through page boundaries, exactly
+        // as a VA→PA walk stitches scattered frames into one logical read.
+        let start = offset as usize;
+        let mut written = 0;
+        while written < buf.len() {
+            let abs = start + written;
+            let page_idx = abs / PAGE_SIZE;
+            let intra = abs % PAGE_SIZE;
+            let Some(page) = self.pages.get(page_idx) else {
+                break;
+            };
+            if intra >= page.len() {
+                break;
+            }
+            let want = (buf.len() - written).min(page.len() - intra);
+            buf[written..written + want].copy_from_slice(&page[intra..intra + want]);
+            written += want;
         }
-        let n = buf.len().min(page.len() - off);
-        buf[..n].copy_from_slice(&page[off..off + n]);
-        n
+        written
     }
 }
 
