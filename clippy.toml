@@ -1,0 +1,6 @@
+# Allow unwrap()/expect() inside tests; production keeps them denied (crate lints).
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+
+# Domain terms that look like code identifiers to doc_markdown.
+doc-valid-idents = ["SecurityRonin", "ElfChnk", "SqliteRecoveryMethod", "SweptItem", "WinPMEM", ".."]
