@@ -17,7 +17,9 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod engine;
+mod registry;
 pub use engine::{sweep, CarveOptions, Region, RegionSource, SweptItem};
+pub use registry::{registered_carvers, CarverRegistration};
 
 /// How (and how broadly) an artifact was recovered — the fleet-wide provenance
 /// vocabulary (ADR 0001 §3). Carving *is* a recovery method, so this general
@@ -229,7 +231,7 @@ impl CarvedItem {
 /// A per-format carver. One impl per format, living in that format's PARSER crate,
 /// seeing only `&[u8]` windows — medium-agnostic by construction, so the same carver
 /// serves disk-unallocated and memory sweeps.
-pub trait Carver {
+pub trait Carver: Send + Sync {
     /// The scheme-prefixed format id this carver produces (e.g. `"sqlite"`).
     fn format(&self) -> &'static str;
 
