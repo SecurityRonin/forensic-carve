@@ -108,7 +108,10 @@ where
     // still found in exactly one chunk's scan buffer.
     let longest = patterns.iter().map(|p| p.len()).max().unwrap_or(0);
     let overlap = longest.saturating_sub(1);
-    let chunk_size = opts.chunk_size.max(1);
+    // A chunk must be at least the longest magic, or a magic can't fit in the scan
+    // buffer (carry + chunk) and would be missed. The default 1 MiB dwarfs any magic;
+    // this only clamps up a pathologically small configured chunk_size.
+    let chunk_size = opts.chunk_size.max(longest).max(1);
 
     let mut out: Vec<SweptItem<R>> = Vec::new();
 
