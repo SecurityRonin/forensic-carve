@@ -104,15 +104,19 @@ pub enum ConfidencePolicy {
 pub struct CarveContext {
     base_offset: u64,
     policy: ConfidencePolicy,
+    method: RecoveryMethod,
 }
 
 impl CarveContext {
     /// A context for a window whose first byte sits at `base_offset` in the source.
+    /// Defaults to the disk Tier-2 (`--unallocated`) recovery method; the driver sets
+    /// the correct one via [`CarveContext::with_method`].
     #[must_use]
     pub const fn at(base_offset: u64) -> Self {
         Self {
             base_offset,
             policy: ConfidencePolicy::KeepAll,
+            method: RecoveryMethod::UnallocatedCarve,
         }
     }
 
@@ -121,6 +125,21 @@ impl CarveContext {
     pub const fn with_policy(mut self, policy: ConfidencePolicy) -> Self {
         self.policy = policy;
         self
+    }
+
+    /// Set the recovery method the driver is carving under (builder style).
+    #[must_use]
+    pub const fn with_method(mut self, method: RecoveryMethod) -> Self {
+        self.method = method;
+        self
+    }
+
+    /// The recovery method for this sweep (the driver's medium/tier). A carver echoes
+    /// this, so the *same* carver stamps `UnallocatedCarve` on a disk sweep and
+    /// `MemoryCarve` on a memory sweep.
+    #[must_use]
+    pub const fn recovery_method(&self) -> RecoveryMethod {
+        self.method
     }
 
     /// The absolute offset of the window's first byte in the source.

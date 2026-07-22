@@ -10,7 +10,7 @@
 
 use aho_corasick::AhoCorasick;
 
-use crate::{CarveContext, CarvedItem, Carver, ConfidencePolicy};
+use crate::{CarveContext, CarvedItem, Carver, ConfidencePolicy, RecoveryMethod};
 
 /// A positioned-read edge over the source being swept. Disk drivers implement it
 /// over `forensic-vfs` positioned reads; memory drivers over `read_virt`. A short
@@ -57,6 +57,10 @@ pub struct CarveOptions {
     pub max_window: u64,
     /// What to do with carved items by confidence.
     pub confidence_policy: ConfidencePolicy,
+    /// The recovery method this sweep carves under — the driver's medium/tier
+    /// (disk unallocated → `UnallocatedCarve`, memory → `MemoryCarve`). Threaded into
+    /// each carver's `CarveContext`.
+    pub recovery_method: RecoveryMethod,
 }
 
 impl Default for CarveOptions {
@@ -65,6 +69,7 @@ impl Default for CarveOptions {
             chunk_size: 1 << 20,   // 1 MiB
             max_window: 256 << 20, // 256 MiB
             confidence_policy: ConfidencePolicy::KeepAll,
+            recovery_method: RecoveryMethod::UnallocatedCarve,
         }
     }
 }
@@ -158,7 +163,9 @@ where
                 let got = source.read_at(artifact_start, &mut window);
                 window.truncate(got);
 
-                let ctx = CarveContext::at(artifact_start).with_policy(opts.confidence_policy);
+                let ctx = CarveContext::at(artifact_start)
+                    .with_method(opts.recovery_method)
+                    .with_policy(opts.confidence_policy);
                 for item in carver.carve(&window, &ctx) {
                     if keeps(opts.confidence_policy, item.confidence()) {
                         out.push(SweptItem {
