@@ -101,7 +101,7 @@ where
         return Vec::new();
     }
     let Ok(ac) = AhoCorasick::new(&patterns) else {
-        return Vec::new();
+        return Vec::new(); // cov:unreachable: patterns is non-empty (guarded above) and within aho-corasick's build limits
     };
 
     // Overlap carried across chunk boundaries so a magic spanning the boundary is
@@ -123,7 +123,7 @@ where
         while pos < region_end {
             let want = chunk_size.min(usize_saturating(region_end - pos));
             if want == 0 {
-                break;
+                break; // cov:unreachable: loop guard `pos < region_end` ⇒ region_end - pos >= 1, and chunk_size >= 1
             }
             let mut chunk = vec![0u8; want];
             let n = source.read_at(pos, &mut chunk);

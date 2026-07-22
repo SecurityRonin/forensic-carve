@@ -1,4 +1,5 @@
 /target
+cov.lcov
 Cargo.lock.bak
 *.swp
 .DS_Store
