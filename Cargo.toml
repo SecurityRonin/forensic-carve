@@ -16,6 +16,7 @@ name = "forensic_carve"
 
 [dependencies]
 aho-corasick = "1"
+inventory = "0.3"
 
 [lints.rust]
 unsafe_code = "forbid"
