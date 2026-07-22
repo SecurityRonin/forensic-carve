@@ -14,6 +14,9 @@ readme = "README.md"
 [lib]
 name = "forensic_carve"
 
+[dependencies]
+aho-corasick = "1"
+
 [lints.rust]
 unsafe_code = "forbid"
 

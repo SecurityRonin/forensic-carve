@@ -16,6 +16,9 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod engine;
+pub use engine::{sweep, CarveOptions, Region, RegionSource, SweptItem};
+
 /// How (and how broadly) an artifact was recovered — the fleet-wide provenance
 /// vocabulary (ADR 0001 §3). Carving *is* a recovery method, so this general
 /// concept owns the plain name; the SQLite-record substrate detail lives in
