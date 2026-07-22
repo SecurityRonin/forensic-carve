@@ -1,0 +1,20 @@
+[package]
+name = "forensic-carve-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+
+[[bin]]
+name = "fuzz_sweep"
+path = "fuzz_targets/fuzz_sweep.rs"
+test = false
+doc = false
+
+[dependencies]
+libfuzzer-sys = "0.4"
+forensic-carve = { path = ".." }
