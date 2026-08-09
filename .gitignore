@@ -1,4 +1,4 @@
-/target
+target/
 cov.lcov
 Cargo.lock.bak
 *.swp
